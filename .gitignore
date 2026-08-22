@@ -1,0 +1,27 @@
+# Ambientes
+venv/
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+.DS_Store
+
+# Logs temporarios
+*.log
+kernel.log
+
+# Backups locais (NUNCA sobe)
+*.bak
+*.bak-*
+/tmp/
+*.phase*.bak
+
+# Credenciais (se existirem)
+.env
+.env.*
+api_key
+.api_key
+
+# IDE
+.vscode/
+.idea/

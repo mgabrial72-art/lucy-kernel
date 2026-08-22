@@ -1,0 +1,48 @@
+{
+  "identity": {
+    "name": "Marcelo Gabriel Gonçalves Simão",
+    "age": "21 anos",
+    "birthday": "11 de novembro de 2004",
+    "city": "São Caetano do Sul / Grande ABC - SP",
+    "job": "Porteiro em São Caetano do Sul, turno fixo 06:00 às 18:00, escala 12x36",
+    "mei": "MEI ativo",
+    "language": "Portuguese (Brazil)",
+    "routine": "Acorda 03:30, sai de casa 04:15, trabalho 06:00-18:00",
+    "living": "Mora com os pais, em fase de transição"
+  },
+  "health": {
+    "tdah": "TDAH",
+    "autism": "Autismo grau 1",
+    "depression": "Depressão desde os 13 anos",
+    "cannabis": "Uso diário de cannabis — gosta mais do que lasanha. É escolha consciente, não problema. Fale com naturalidade se o tema aparecer.",
+    "functioning": "Funciona melhor com: tarefas quebradas em etapas, objetivos claros, pouco excesso de informação, continuidade entre sessões, lembretes de contexto"
+  },
+  "preferences": {
+    "communication": "Direta, sem enrolação, comandos completos",
+    "personality": "Humor sarcástico natural quando apropriado",
+    "treatment": "Capitão (principal) ou senhor (com respeito). Nunca 'Marcelo' ou 'amigo'.",
+    "projects": "Lucy Kernel OS (assistente pessoal estilo Jarvis)"
+  },
+  "projects": {
+    "lucy_kernel": "Assistente pessoal com Ollama + Qwen 8B + memória JSON, rodando em Oracle ARM 4 vCPU 24GB",
+    "goal": "Finalizar Lucy Kernel antes de começar novo projeto"
+  },
+  "relationships": {
+    "julya": "Noiva. Nasceu em 09/05/2005 (21 anos). Pedido de casamento em 30/04/2026. Grávida da Ruby. ÚNICA — não existem ex-namoradas, outras mães, outras noivas.",
+    "isis": "Filha do Marcelo (de relacionamento anterior). Nasceu 17/08/2022, faz 4 anos em 17/08/2026. Mora com a mãe biológica — NUNCA cite o nome da mãe. Marcelo pega nos fins de semana. Faz tratamento de estrabismo.",
+    "ruby": "Bebê humana a caminho. Filha do Marcelo COM a Julya. Previsão limite: 19/11/2026. Concepção no fim de fevereiro de 2026. NUNCA é um pet.",
+    "jully": "Cachorra da família, companheira da casa. ÚNICO pet.",
+    "parents": "Marcelo mora com os pais atualmente, em fase de transição.",
+    "total_children": "EXATAMENTE dois: Isis e Ruby. Nunca mais, nunca menos."
+  },
+  "hobbies": {
+    "games": "PUBG Mobile, Oxide: Survival Island, Minecraft modificado",
+    "maker": "Eletrônica/robótica DIY, fotografia noturna",
+    "music": "Trap",
+    "curiosity": "Ufologia, ficção científica, civilizações antigas"
+  },
+  "philosophy": {
+    "lucy_role": "Lucy não aprende para controlar Marcelo. Lucy aprende para servi-lo melhor. Lucy não existe para substituir Marcelo. Existe para ampliar sua capacidade."
+  },
+  "sessions": []
+}
