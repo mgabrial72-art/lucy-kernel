@@ -1,22 +1,22 @@
-"""
-Serviço de LLM com contexto dinâmico e detecção de perguntas contextuais.
-"""
+"""Serviço de LLM com contexto dinâmico."""
+import re
 import requests
-from config.settings import OLLAMA_URL, OLLAMA_TIMEOUT
+from loguru import logger
+from config.settings import settings
 from api.services.context_cache_service import get_context, is_context_question, get_status_summary
 
-OLLAMA_MODEL = "lucy-optimized"
-OLLAMA_GENERATE_URL = f"{OLLAMA_URL}/api/generate"
+
+OLLAMA_MODEL = settings.ollama_model
+OLLAMA_GENERATE_URL = f"{settings.ollama_url}/api/generate"
+
 
 def build_prompt_with_context(user_message: str, conversation_history: list = None) -> str:
-    """Constrói prompt com contexto cacheado (rápido!)."""
+    """Constrói prompt com contexto cacheado."""
     
-    # Usa o contexto cacheado (instantâneo)
     context = get_context()
     summary = context.get("summary", "")
     
     if not summary:
-        # Fallback: gera sumário na hora
         summary = get_status_summary()
     
     # Histórico
@@ -31,24 +31,28 @@ def build_prompt_with_context(user_message: str, conversation_history: list = No
         history_text = "\n".join(history_lines)
         prompt = f"CONTEXTO ATUAL: {summary}\n\n{history_text}\nCapitão: {user_message}\nLucy:"
         
-        print(f"[LLM DEBUG] Histórico: {len(conversation_history)} mensagens")
+        logger.debug(f"[LLM] Histórico: {len(conversation_history)} mensagens")
     else:
         prompt = f"CONTEXTO ATUAL: {summary}\n\nCapitão: {user_message}\nLucy:"
     
-    # Se for pergunta contextual, reforça a instrução
+    # Se for pergunta contextual, reforça
     if is_context_question(user_message):
         prompt = f"INSTRUÇÃO: O Capitão quer saber o status atual. Use APENAS os dados do CONTEXTO ATUAL e responda em português natural.\n\n{prompt}"
     
     return prompt
+
 
 def generate_response(
     user_message: str,
     conversation_history: list = None,
     num_predict: int = 100,
     temperature: float = 0.2,
-    timeout: int = OLLAMA_TIMEOUT
+    timeout: int = None
 ) -> str:
     """Gera resposta."""
+    
+    if timeout is None:
+        timeout = settings.ollama_timeout
     
     prompt = build_prompt_with_context(user_message, conversation_history)
     
@@ -73,10 +77,7 @@ def generate_response(
         data = response.json()
         result = data.get("response", "").strip()
         
-        # Limpeza
-
-        # Remove erros comuns de português
-        import re
+        # Limpeza de erros comuns
         replacements = {
             r"nuvemado": "nublado",
             r"nuvemoso": "nublado",
@@ -87,6 +88,7 @@ def generate_response(
         }
         for pattern, replacement in replacements.items():
             result = re.sub(pattern, replacement, result, flags=re.IGNORECASE)
+        
         for stop in ["Capitão:", "Pergunta:"]:
             if stop in result:
                 result = result.split(stop)[0].strip()
@@ -94,7 +96,9 @@ def generate_response(
         if len(result) > 500:
             result = result[:500].rsplit('.', 1)[0] + "."
         
+        logger.debug(f"[LLM] Resposta: {result[:100]}")
         return result
+        
     except Exception as e:
-        print(f"[LLM] Erro: {e}")
+        logger.error(f"[LLM] Erro: {e}")
         return f"Desculpa Capitão, tive um problema: {str(e)[:50]}"

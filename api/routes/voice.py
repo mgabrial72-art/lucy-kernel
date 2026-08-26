@@ -1,17 +1,20 @@
-"""
-Endpoint de voz com histórico (MP3 via Edge TTS)
-"""
+"""Endpoint de voz com histórico persistente."""
 from fastapi import APIRouter, Request, Query
 from fastapi.responses import Response
+from fastapi.concurrency import run_in_threadpool
+from loguru import logger
+
 from api.services.llm_service import generate_response
 from api.services.tts_service import text_to_speech
-from api.routes.chat import conversation_history
+from api.services.history_service import add_message, get_history
+
 
 router = APIRouter()
 
+
 @router.post("/voice")
 async def voice(request: Request, session_id: str = Query(default="default")):
-    """Recebe texto, gera resposta COM histórico, retorna áudio MP3."""
+    """Recebe texto, gera resposta COM histórico, retorna áudio."""
     body = await request.body()
     text = body.decode("utf-8").strip()
     
@@ -23,22 +26,24 @@ async def voice(request: Request, session_id: str = Query(default="default")):
         )
     
     session = session_id or "default"
+    logger.info(f"🎤 Voice [{session}]: {text[:50]}...")
     
-    # Pega histórico ANTES
-    history = list(conversation_history[session])
+    # Histórico persistente
+    history = await get_history(session, limit=10)
     
-    # Gera resposta COM histórico
-    response_text = generate_response(
+    # Gera resposta em thread pool
+    response_text = await run_in_threadpool(
+        generate_response,
         text,
         conversation_history=history
     )
     
-    # Adiciona AO histórico DEPOIS
-    conversation_history[session].append({"role": "user", "content": text})
-    conversation_history[session].append({"role": "assistant", "content": response_text})
+    # Salva no histórico
+    await add_message(session, "user", text)
+    await add_message(session, "assistant", response_text)
     
-    # Converte em áudio (Edge TTS retorna MP3)
-    audio_data = text_to_speech(response_text)
+    # Converte em áudio em thread pool
+    audio_data = await run_in_threadpool(text_to_speech, response_text)
     
     if not audio_data:
         return Response(
@@ -47,22 +52,17 @@ async def voice(request: Request, session_id: str = Query(default="default")):
             status_code=500
         )
     
-    # Detecta formato: Edge TTS = MP3, Piper = WAV
+    # Detecta formato
     is_mp3 = b'ID3' in audio_data[:20] or b'LAME' in audio_data[:100]
     media_type = "audio/mpeg" if is_mp3 else "audio/wav"
     
-    print(f"[VOICE] Resposta: {response_text[:100]}")
-    print(f"[VOICE] Áudio: {len(audio_data)} bytes, formato: {media_type}")
-    
-    # Headers customizados
-    headers = {
-        "X-Response-Text": response_text[:200].replace("\n", " "),
-        "X-Lucy-Session": session_id,
-        "X-Content-Length": str(len(audio_data))
-    }
+    logger.info(f"🔊 Áudio gerado: {len(audio_data)} bytes ({media_type})")
     
     return Response(
         content=audio_data,
         media_type=media_type,
-        headers=headers
+        headers={
+            "X-Response-Text": response_text[:200].replace("\n", " "),
+            "X-Lucy-Session": session_id
+        }
     )

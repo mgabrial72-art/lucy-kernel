@@ -1,21 +1,17 @@
-"""
-Serviço de clima usando Open-Meteo (gratuito, preciso, sem API key)
-Coordenadas específicas de São Paulo
-"""
+"""Serviço de clima usando Open-Meteo (gratuito, preciso, sem API key)."""
 import requests
 from datetime import datetime
+from loguru import logger
+from config.settings import settings
 
-# Coordenadas exatas de São Paulo (capital)
-SP_LATITUDE = -23.5505
-SP_LONGITUDE = -46.6333
 
 def get_weather_sao_paulo() -> dict:
     """Retorna clima atual de São Paulo usando Open-Meteo."""
     try:
         url = "https://api.open-meteo.com/v1/forecast"
         params = {
-            "latitude": SP_LATITUDE,
-            "longitude": SP_LONGITUDE,
+            "latitude": settings.sp_latitude,
+            "longitude": settings.sp_longitude,
             "current": "temperature_2m,relative_humidity_2m,apparent_temperature,weather_code,wind_speed_10m,wind_direction_10m",
             "timezone": "America/Sao_Paulo",
             "forecast_days": 1
@@ -33,8 +29,6 @@ def get_weather_sao_paulo() -> dict:
         wind_kmh = current.get("wind_speed_10m")
         weather_code = current.get("weather_code", 0)
         
-        # Traduz weather_code WMO pra português
-        # Fonte: https://open-meteo.com/en/docs
         weather_codes_pt = {
             0: "Céu limpo",
             1: "Predominantemente limpo",
@@ -78,8 +72,9 @@ def get_weather_sao_paulo() -> dict:
         }
         
     except Exception as e:
-        print(f"[WEATHER] Erro: {e}")
+        logger.error(f"[WEATHER] Erro: {e}")
         return {"error": str(e)}
+
 
 def get_weather_summary() -> str:
     """Retorna resumo do clima em texto."""
@@ -93,7 +88,3 @@ def get_weather_summary() -> str:
         f"{weather['temperature']} (sensação {weather['feels_like']}), "
         f"umidade {weather['humidity']}, vento {weather['wind']}"
     )
-
-if __name__ == "__main__":
-    print("Testando clima (Open-Meteo):")
-    print(get_weather_summary())

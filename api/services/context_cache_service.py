@@ -399,11 +399,11 @@ def _background_updater(interval_seconds: int = 900):
         # Faz ping no Ollama pra manter quente
         try:
             import requests
-            from config.settings import OLLAMA_URL, OLLAMA_MODEL
+            from config.settings import settings
             requests.post(
-                f"{OLLAMA_URL}/api/generate",
+                f"{settings.ollama_url}/api/generate",
                 json={
-                    "model": OLLAMA_MODEL,
+                    "model": settings.ollama_model,
                     "prompt": "OK",
                     "stream": False,
                     "keep_alive": "24h",
