@@ -1,0 +1,25 @@
+{
+    "vector_store": {
+        "provider": "qdrant",
+        "config": {
+            "collection_name": "lucy_memories",
+            "embedding_model_dims": 768,
+            "on_disk": true,
+            "path": "/home/ubuntu/lucy-frankenstein/memory/qdrant_data"
+        }
+    },
+    "embedder": {
+        "provider": "ollama",
+        "config": {
+            "model": "nomic-embed-text:latest"
+        }
+    },
+    "llm": {
+        "provider": "ollama",
+        "config": {
+            "model": "qwen2.5:0.5b",
+            "temperature": 0.1
+        }
+    },
+    "version": "v1.1"
+}
