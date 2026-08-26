@@ -118,7 +118,7 @@ async def health():
 
 
 # Rotas
-from api.routes import chat, voice, reminders, debug, schedule, weather, status
+from api.routes import chat, voice, reminders, debug, schedule, weather, status, cache_stats
 app.include_router(chat.router, prefix="/v1")
 app.include_router(voice.router, prefix="/v1")
 app.include_router(reminders.router, prefix="/v1")
@@ -126,5 +126,6 @@ app.include_router(debug.router, prefix="/v1")
 app.include_router(schedule.router, prefix="/v1")
 app.include_router(weather.router, prefix="/v1")
 app.include_router(status.router, prefix="/v1")
+app.include_router(cache_stats.router, prefix="/v1")
 
 logger.info("✅ Aplicação Lucy inicializada")
