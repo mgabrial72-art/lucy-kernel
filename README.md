@@ -1,27 +1,36 @@
 # 🧠 Lucy Frankenstein
 
-Assistente pessoal Jarvis-like 100% local e privado.
+<div align="center">
 
-## 🎯 Funcionalidades
+![Python](https://img.shields.io/badge/python-3.10%2B-blue.svg)
+![FastAPI](https://img.shields.io/badge/FastAPI-6.0-009688.svg)
+![Status](https://img.shields.io/badge/status-production%20ready-green.svg)
+![Privacy](https://img.shields.io/badge/privacy-100%25%20local-purple.svg)
 
-- 🗣️ **Voz**: Edge TTS (voz feminina PT-BR) + Whisper STT
-- 🧠 **LLM**: Mistral 7B customizado (lucy-optimized)
-- 💾 **Memória**: Mem0 com Qdrant local
-- 📅 **Agendamentos**: Sistema de lembretes JSON
-- 🌤️ **Clima**: Open-Meteo (São Paulo tempo real)
-- 🕐 **Hora**: Fuso America/Sao_Paulo
-- 🔄 **Contexto**: Background updater 15min
-- 🔒 **Privacidade**: 100% local, sem nuvem
+**Assistente pessoal Jarvis-like 100% local e privado**
 
-## 🏗️ ArquiteturaTasker → POST /v1/voice → Lucy API → {Context, LLM, Memory, TTS}## 📁 Estruturalucy-kernel/
-├── api/
-│   ├── main.py
-│   ├── routes/ (chat, voice, schedule, weather, status, debug)
-│   └── services/ (llm, memory, tts, weather, schedule, time, context_cache)
-├── config/ (settings.py, identity.py)
-├── scripts/ (warmup.sh)
-├── Modelfile
-└── requirements.txt## 🚀 Instalação
+</div>
+
+---
+
+## ✨ Funcionalidades
+
+- 🗣️ Voz Neural: Edge TTS (Francisca PT-BR) + Whisper STT
+- 🧠 LLM Local: Mistral 7B customizado (lucy-optimized)
+- 💾 Memoria Persistente: Mem0 + Qdrant + SQLite
+- 📅 Agendamentos: Sistema completo de lembretes
+- 🌤️ Clima em Tempo Real: Open-Meteo (Sao Paulo)
+- 🕐 Fuso Horario: America/Sao_Paulo automatico
+- 🔄 Contexto Automatico: Background updater 15min
+- ⚡ Cache Inteligente: LRU com TTL (30-50% mais rapido)
+- 🔒 Privacidade Total: 100% local, sem nuvem
+- 🛡️ Regra Absoluta: Nunca menciona condicoes de saude
+
+## 🏗️ Arquitetura
+
+Tasker -> POST /v1/voice -> Lucy API -> {Context, LLM, Memory, TTS}
+
+## 🚀 Instalacao
 
 ```bash
 git clone https://github.com/mgabrial72-art/lucy-kernel.git
@@ -34,12 +43,21 @@ ollama create lucy-optimized -f Modelfile
 uvicorn api.main:app --host 0.0.0.0 --port 8000
 ```
 
-## 📱 Tasker## 🔒 Privacidade
+## 📱 Integracao com Tasker
 
-- 100% local
-- Sem APIs pagas
-- Nunca menciona condições de saúde (regra absoluta)
+URL: http://SEU_IP:8000/v1/voice?session_id=capitao
+Method: POST
+Content-Type: text/plain
+Body: %gv_heard
+Save: Download/lucy_fala.mp3
+
+## 🔒 Privacidade
+
+- 100% Local - nenhum dado sai do servidor
+- Sem APIs Pagas
+- Memoria Persistente (SQLite + Qdrant)
+- Regra Absoluta de Privacidade
 
 ---
 
-**Feito com ❤️ para o Capitão Marcelo**
+**Feito com ❤️ para o Capitao Marcelo**

@@ -1,5 +1,6 @@
-"""TTS Service OTIMIZADO - async correto + cache de frases comuns."""
+"""TTS Service - Cache com hash estável (MD5)."""
 import asyncio
+import hashlib
 import tempfile
 import os
 import subprocess
@@ -23,59 +24,50 @@ VOICE_MODELS_DIR = settings.voice_dir / "models"
 
 
 def _clean_text(text: str) -> str:
-    """Limpa texto para TTS."""
     text = text.replace("**", "").replace("*", "").replace("`", "")
     text = text.replace("😎", "").replace("😏", "").replace("🙏", "")
     return text.strip()
 
 
 def _cache_key(text: str) -> str:
-    """Gera chave de cache baseada no texto."""
+    """Hash estável usando MD5 (não muda entre execuções)."""
     normalized = text.lower().strip()
     if normalized in COMMON_PHRASES:
         return f"common:{normalized}"
-    # Para textos longos, usa hash
-    return f"text:{hash(text)}"
+    text_hash = hashlib.md5(normalized.encode('utf-8')).hexdigest()[:16]
+    return f"text:{text_hash}"
 
 
 def text_to_speech(text: str) -> bytes:
-    """Converte texto em áudio (usa cache para frases comuns)."""
+    """Converte texto em áudio (com cache estável)."""
     clean_text = _clean_text(text)
     if not clean_text:
         clean_text = "Desculpa Capitão, não consegui processar."
     
-    # Verifica cache
     cache_key = _cache_key(clean_text)
     cached_audio = tts_cache.get(cache_key)
     if cached_audio:
-        logger.debug(f"💾 TTS cache hit: {clean_text[:30]}")
+        logger.info(f"💾 TTS cache hit: {clean_text[:30]}")
         return cached_audio
     
-    # Tenta Edge TTS (feminino)
     if EDGE_TTS_AVAILABLE:
         try:
             audio_data = _edge_tts_sync(clean_text)
             if audio_data:
-                logger.info(f"[TTS] Edge TTS: {len(audio_data)} bytes (voz feminina)")
-                # Cacheia frases comuns
-                if clean_text.lower().strip() in COMMON_PHRASES:
+                logger.info(f"[TTS] Edge TTS: {len(audio_data)} bytes")
+                if clean_text.lower().strip() in COMMON_PHRASES or len(clean_text) < 100:
                     tts_cache.set(cache_key, audio_data)
-                    logger.debug(f"💾 TTS cache set: {clean_text[:30]}")
                 return audio_data
         except Exception as e:
             logger.warning(f"[TTS] Edge TTS falhou: {e}")
     
-    # Fallback Piper
-    logger.info("[TTS] Usando Piper (fallback)")
     return _piper_tts(clean_text)
 
 
 def _edge_tts_sync(text: str) -> bytes:
-    """Edge TTS - usa event loop existente se disponível."""
     async def _generate() -> bytes:
         with tempfile.NamedTemporaryFile(suffix=".mp3", delete=False) as tmp:
             tmp_path = tmp.name
-        
         try:
             communicate = edge_tts.Communicate(text, EDGE_VOICE)
             await communicate.save(tmp_path)
@@ -85,11 +77,9 @@ def _edge_tts_sync(text: str) -> bytes:
             if os.path.exists(tmp_path):
                 os.remove(tmp_path)
     
-    # Tenta usar loop existente, senão cria novo
     try:
         loop = asyncio.get_event_loop()
         if loop.is_running():
-            # Estamos em contexto async, cria nova thread
             import concurrent.futures
             with concurrent.futures.ThreadPoolExecutor() as pool:
                 future = pool.submit(asyncio.run, _generate())
@@ -101,9 +91,7 @@ def _edge_tts_sync(text: str) -> bytes:
 
 
 def _piper_tts(text: str) -> bytes:
-    """Piper TTS (fallback)."""
     voice_path = VOICE_MODELS_DIR / f"{PIPER_VOICE}.onnx"
-    
     if not voice_path.exists():
         logger.error(f"[TTS] Piper voice não encontrada: {voice_path}")
         return b""
@@ -118,11 +106,8 @@ def _piper_tts(text: str) -> bytes:
             capture_output=True,
             timeout=30
         )
-        
         if result.returncode != 0:
-            logger.error(f"[TTS] Piper erro: {result.stderr.decode()[:200]}")
             return b""
-        
         with open(tmp_path, "rb") as f:
             return f.read()
     finally:
