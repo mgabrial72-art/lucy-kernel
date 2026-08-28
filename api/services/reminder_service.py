@@ -3,8 +3,7 @@ Serviço de lembretes usando Mem0 + SQLite simples
 """
 import sqlite3
 from pathlib import Path
-from datetime import datetime, timedelta
-import json
+from datetime import datetime
 
 DB_PATH = Path(__file__).parent.parent.parent / "memory" / "reminders.db"
 

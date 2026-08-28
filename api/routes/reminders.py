@@ -1,7 +1,7 @@
 """
 Endpoint de lembretes - SQLite simples
 """
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter
 from pydantic import BaseModel
 from typing import Optional
 from api.services.reminder_service import (

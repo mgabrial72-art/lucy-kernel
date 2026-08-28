@@ -1,7 +1,7 @@
 """Versão sem Mem0 pra testar performance pura"""
 import requests
 import time
-from config.settings import OLLAMA_URL, OLLAMA_MODEL, OLLAMA_TIMEOUT
+from config.settings import OLLAMA_URL, OLLAMA_MODEL
 from config.identity import LUCY_SYSTEM_PROMPT
 
 OLLAMA_GENERATE_URL = f"{OLLAMA_URL}/api/generate"

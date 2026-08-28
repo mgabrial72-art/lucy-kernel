@@ -5,7 +5,7 @@ import json
 from pathlib import Path
 from datetime import datetime
 import pytz
-from typing import List, Optional
+from typing import List
 
 SCHEDULES_FILE = Path(__file__).parent.parent.parent / "memory" / "schedules" / "capitao.json"
 

@@ -4,7 +4,6 @@ import hashlib
 import tempfile
 import os
 import subprocess
-from pathlib import Path
 from loguru import logger
 
 try:

@@ -4,7 +4,7 @@ import requests
 from loguru import logger
 from config.settings import settings
 from api.services.context_cache_service import (
-    get_context, is_context_question, get_status_summary
+    is_context_question, get_status_summary
 )
 
 

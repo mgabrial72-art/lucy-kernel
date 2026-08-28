@@ -2,7 +2,6 @@
 Speech-to-Text usando faster-whisper (local, CPU-only)
 """
 from faster_whisper import WhisperModel
-from pathlib import Path
 import tempfile
 import os
 

@@ -3,7 +3,6 @@ from fastapi import Request, status
 from fastapi.responses import JSONResponse
 from fastapi.exceptions import RequestValidationError
 from loguru import logger
-import traceback
 
 
 async def global_exception_handler(request: Request, exc: Exception) -> JSONResponse:
