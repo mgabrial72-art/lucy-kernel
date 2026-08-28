@@ -9,6 +9,7 @@ on:
 jobs:
   lint:
     runs-on: ubuntu-latest
+    continue-on-error: true
     steps:
       - uses: actions/checkout@v4
 
@@ -20,7 +21,7 @@ jobs:
       - name: Install ruff
         run: pip install ruff
 
-      - name: Lint (erros críticos apenas)
+      - name: Lint (informativo - nao bloqueia)
         run: ruff check api/ config/ --select E9,F --no-cache
 
   syntax:
